@@ -68,8 +68,9 @@ public class Main {
             if (added % 20 == 0 || added == sets.size()) {
                 int retries = 30;
                 boolean done = false;
+                int page = 0;
                 while (retries > 0 && !done) {
-                    String url = "http://gatherer.wizards.com/Pages/Search/Default.aspx?action=advanced&output=checklist&set=" + sb.toString();
+                    String url = "http://gatherer.wizards.com/Pages/Search/Default.aspx?action=advanced&output=checklist&set=" + sb.toString() + "&page=" + page;
                     Connection connection = Jsoup.connect(url);
                     connection.timeout(300000);
                     Document doc = connection.get();
@@ -84,7 +85,13 @@ public class Main {
                             }
                         }
                     }
-                    done = true;
+
+                    Elements navigationElements = doc.select(".pagingcontrols div a");
+                    try {
+                        Integer.parseInt(navigationElements.last().text());
+                        done = true;
+                    } catch (NumberFormatException e) {}
+                    page++;
                 }
 
                 if (!done) {
